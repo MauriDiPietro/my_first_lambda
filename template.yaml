@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  lambda-hexagonal
+Globals:
+  Function:
+    Environment:
+      Variables:
+        REGION: "us-west-2"
+        SAM_CLI_BETA_ESBUILD: 1
+        ENV: "develope"
+        DBHOST: 192.168.0.8
+        DBPORT: 5432
+        DBUSER: "postgres"
+        DBPASSWORD: "postgres"
+        DBNAME: "fsn_test"
+        DBTYPE: "postgres"
+    Timeout: 180
+    Runtime: nodejs16.x
+    MemorySize: 2048
+    VpcConfig:
+      SecurityGroupIds:
+        - sg-0b514144e60fce4be
+      SubnetIds:
+        - subnet-0ceeb1725924d870c
+        - subnet-02066ea5b57d6dcc6
+        - subnet-044dc17cf76b14152
+Resources:
+  UserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./src/
+      Handler: app.userHandler
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /api/create-user
+            Method: POST
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: false
+        Target: 'es2020'
+        Sourcemap: true
+        UseNpmCi: true
